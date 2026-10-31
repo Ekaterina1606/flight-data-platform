@@ -191,6 +191,10 @@ The quality checks also identified incomplete or inconsistent source values. The
 ```text
 flight-data-platform/
 │
+├── .github/
+│   └── workflows/
+│       └── tests.yml
+│
 ├── dags/
 │   └── flight_pipeline.py
 │
@@ -211,6 +215,10 @@ flight-data-platform/
 │   ├── 07_add_date_fk.sql
 │   └── 08_analytics.sql
 │
+├── tests/
+│   ├── test_extract_flights.py
+│   └── test_load_flights.py
+│
 ├── screenshots/
 │   ├── 01_airflow_graph.png
 │   ├── 02_airflow_success.png
@@ -225,6 +233,7 @@ flight-data-platform/
 ├── Dockerfile
 ├── docker-compose.yml
 ├── requirements.txt
+├── requirements-dev.txt
 ├── run_pipeline.py
 ├── .env.example
 └── README.md
@@ -299,12 +308,32 @@ It reads the raw JSON input and writes Parquet output to `data/processed/flights
 
 ## Current Scope and Limitations
 
-- The project uses a local Docker Compose environment.
+- The project runs in a local Docker Compose environment.
 - Airflow uses LocalExecutor; no distributed Airflow deployment is configured.
 - The DAG is manually triggered and does not currently use a scheduled interval.
-- PySpark processing is a separate local workflow.
+- PySpark processing is implemented as a separate local workflow.
 - The pipeline depends on the availability and response structure of the Aviationstack API.
-- Automated unit and integration test coverage is not yet included.
+- Automated tests currently cover API ingestion, JSON file handling, source ID generation, and database loading logic.
+- API requests and database interactions are mocked in unit tests to avoid external dependencies.
+
+
+## Testing
+
+The project includes automated tests written with pytest.
+
+The test suite covers:
+
+- API pagination and error handling.
+- Saving flight records to JSON.
+- Generating unique source IDs.
+- Handling incomplete flight records.
+- Database insertion logic using mocked PostgreSQL connections.
+
+Run the tests locally:
+
+```bash
+pip install -r requirements-dev.txt
+python -m pytest -v
 
 ## Possible Next Steps
 
