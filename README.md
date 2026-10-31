@@ -313,7 +313,7 @@ It reads the raw JSON input and writes Parquet output to `data/processed/flights
 - The DAG is manually triggered and does not currently use a scheduled interval.
 - PySpark processing is implemented as a separate local workflow.
 - The pipeline depends on the availability and response structure of the Aviationstack API.
-- Automated tests currently cover API ingestion, JSON file handling, source ID generation, and database loading logic.
+- Automated tests cover API ingestion, JSON file handling, source ID generation, and database loading logic.
 - API requests and database interactions are mocked in unit tests to avoid external dependencies.
 
 
@@ -337,7 +337,7 @@ python -m pytest -v
 
 ## Possible Next Steps
 
-- Add automated tests for ingestion and transformation logic.
+- Expand automated test coverage for data transformations and data quality checks.
 - Add incremental loading and retry handling.
 - Integrate the PySpark job into the orchestration workflow.
 - Add monitoring and more detailed pipeline-level observability.
