@@ -141,17 +141,22 @@ Some source records may contain incomplete or inconsistent values. Non-critical 
 
 ## PySpark Processing
 
-The project also includes a standalone PySpark script in `spark/transform_flights.py`.
+The project also includes a standalone PySpark implementation in `spark/transform_flights.py`.
 
 It:
-
 - Reads the raw JSON file.
 - Extracts flight attributes from the API response.
 - Converts date and timestamp fields.
-- Checks the number of records and missing flight identifiers.
+- Performs basic data quality checks, including record count and missing flight identifiers.
 - Writes the transformed dataset in Parquet format.
 
-This job runs locally and is currently independent of the Airflow workflow.
+### Alternative Processing Approach
+
+The main ETL pipeline uses Python and SQL for data ingestion and transformation. This approach is sufficient for the current data volume and avoids unnecessary processing overhead.
+
+The PySpark implementation demonstrates an alternative data processing approach. It is intentionally kept separate from the main Airflow workflow because distributed processing is not required at the current scale of this project.
+
+This implementation demonstrates familiarity with Apache Spark and provides a basis for exploring how the processing layer could evolve as data volume and complexity grow.
 
 ## SQL Analytics
 

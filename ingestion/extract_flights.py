@@ -4,62 +4,82 @@ import json
 import requests
 from dotenv import load_dotenv
 
-load_dotenv()
-
-API_KEY = os.getenv("AVIATIONSTACK_API_KEY")
-
-if not API_KEY:
-    raise ValueError("AVIATIONSTACK_API_KEY is not set")
 
 URL = "https://api.aviationstack.com/v1/flights"
 
 LIMIT = 100
 TARGET_FLIGHTS = 1000
+OUTPUT_PATH = "data/raw/flights/flights.json"
 
-all_flights = []
 
-for offset in range(0, TARGET_FLIGHTS, LIMIT):
-    params = {
-        "access_key": API_KEY,
-        "limit": LIMIT,
-        "offset": offset,
-    }
+def fetch_flights(api_key, limit=LIMIT, target_flights=TARGET_FLIGHTS):
+    """Fetch flight records from Aviationstack API using pagination."""
+    all_flights = []
 
-    response = requests.get(URL, params=params, timeout=30)
-    response.raise_for_status()
+    for offset in range(0, target_flights, limit):
+        params = {
+            "access_key": api_key,
+            "limit": limit,
+            "offset": offset,
+        }
 
-    page = response.json()
+        response = requests.get(URL, params=params, timeout=30)
+        response.raise_for_status()
 
-    if page.get("error"):
-        raise ValueError(f"Aviationstack API error: {page['error']}")
+        page = response.json()
 
-    flights = page.get("data")
+        if not isinstance(page, dict):
+            raise ValueError("Invalid API response format")
 
-    if not isinstance(flights, list):
-        raise ValueError("API response does not contain a valid flights list")
+        if page.get("error"):
+            raise ValueError(f"Aviationstack API error: {page['error']}")
 
-    all_flights.extend(flights)
+        flights = page.get("data")
 
-    print(
-        f"Loaded page offset={offset}: {len(flights)} flights",
-        flush=True
-    )
+        if not isinstance(flights, list):
+            raise ValueError(
+                "API response does not contain a valid flights list"
+            )
 
-    if len(flights) < LIMIT:
-        break
+        all_flights.extend(flights)
 
-os.makedirs("data/raw/flights", exist_ok=True)
+        print(
+            f"Loaded page offset={offset}: {len(flights)} flights",
+            flush=True
+        )
 
-with open(
-    "data/raw/flights/flights.json",
-    "w",
-    encoding="utf-8"
-) as file:
-    json.dump(
-        {"data": all_flights},
-        file,
-        ensure_ascii=False,
-        indent=2
-    )
+        if len(flights) < limit:
+            break
 
-print(f"Extracted {len(all_flights)} flights in total")
+    return all_flights
+
+
+def save_flights(flights, output_path=OUTPUT_PATH):
+    """Save flight records to a JSON file."""
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+
+    with open(output_path, "w", encoding="utf-8") as file:
+        json.dump(
+            {"data": flights},
+            file,
+            ensure_ascii=False,
+            indent=2
+        )
+
+
+def main():
+    load_dotenv()
+
+    api_key = os.getenv("AVIATIONSTACK_API_KEY")
+
+    if not api_key:
+        raise ValueError("AVIATIONSTACK_API_KEY is not set")
+
+    flights = fetch_flights(api_key)
+    save_flights(flights)
+
+    print(f"Extracted {len(flights)} flights in total")
+
+
+if __name__ == "__main__":
+    main()
