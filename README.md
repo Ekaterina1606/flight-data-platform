@@ -334,11 +334,3 @@ Run the tests locally:
 ```bash
 pip install -r requirements-dev.txt
 python -m pytest -v
-
-## Possible Next Steps
-
-- Expand automated test coverage for data transformations and data quality checks.
-- Add incremental loading and retry handling.
-- Integrate the PySpark job into the orchestration workflow.
-- Add monitoring and more detailed pipeline-level observability.
-- Deploy the platform to a cloud environment.
