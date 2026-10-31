@@ -1,4 +1,36 @@
+# Environment variables and secrets
 .env
+.env.*
+!.env.example
+
+# Python
 .venv/
 __pycache__/
+*.py[cod]
+
+# macOS
 .DS_Store
+
+# Spark
+spark-warehouse/
+metastore_db/
+derby.log
+
+# Test and cache files
+.pytest_cache/
+.mypy_cache/
+
+# IDE
+.vscode/
+
+# Airflow logs
+logs/
+
+# Generated data
+data/processed/
+
+# Downloaded raw API data
+data/raw/flights/flights.json
+
+# Temporary Spark test
+spark_test.py
