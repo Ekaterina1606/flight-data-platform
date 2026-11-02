@@ -57,6 +57,7 @@ PySpark is used separately for local batch processing. It is not currently part 
                 Parquet files
 ```
 
+
 ## Technology Stack
 
 | Technology | Purpose |
@@ -65,9 +66,11 @@ PySpark is used separately for local batch processing. It is not currently part 
 | Apache Airflow 2.10.5 | Workflow orchestration |
 | PostgreSQL 17 | Raw storage, staging, and data warehouse |
 | SQL | Data transformations, quality checks, and analytics |
+| Tableau Public | BI dashboards and data visualization |
 | PySpark 4.2.1 | Separate batch processing workflow |
 | Docker Compose | Local environment and service management |
 | Aviationstack API | Flight data source |
+
 
 ## Airflow Pipeline
 
@@ -171,6 +174,61 @@ The SQL analytics script in `sql/08_analytics.sql` contains queries for explorin
 - Average flight duration.
 - Flights scheduled more than two hours ahead.
 
+## BI & Analytics
+
+The platform includes a business intelligence layer built on top of the PostgreSQL dimensional data warehouse.
+
+### Analytics Data Mart
+
+The `analytics.mart_flight_operations` SQL view joins flight facts with airline, airport, and date dimensions to provide a reporting-ready dataset.
+
+The view is defined in [`sql/09_create_analytics_mart.sql`](sql/09_create_analytics_mart.sql).
+
+The analytics mart contains flight dates, airline names, departure and arrival airports, flight statuses, and scheduled timestamps.
+
+Data is exported from PostgreSQL to CSV and visualized in Tableau Public.
+
+
+### Tableau Public Dashboards
+
+**Flight Operations Overview**
+
+This dashboard provides a high-level overview of the collected flight data:
+
+- Total Flights: **3,293**
+- Total Airlines: **314**
+- Departure Airports: **425**
+- Top 10 Airlines by Number of Flights
+- Top 10 Departure Airports by Flights
+- Flight Status Distribution (Donut Chart)
+
+![Flight Operations Overview](screenshots/Dashboard-1.png)
+
+**Flight Routes & Airport Analytics**
+
+This dashboard focuses on route patterns and airline operations:
+
+- Top 10 Flight Routes (Bar Chart)
+- Top 10 Flight Routes (Sankey Diagram)
+- Airline Flight Status Heatmap
+
+![Flight Routes & Airport Analytics](screenshots/Dashboard-2.png)
+
+
+### Explore the Dashboards
+
+[View Flight Data Platform on Tableau Public](https://public.tableau.com/app/profile/sophia.bank/viz/FlightOperationsDashboardAviationDataAnalytics/Dashboard2)
+
+Both dashboards are designed as part of the same Tableau workbook.
+
+### BI Data Flow
+
+`PostgreSQL DWH → Analytics Mart → CSV Export → Tableau Public`
+
+The Tableau dashboards use a CSV snapshot rather than a live database connection. Refreshing the visualizations requires exporting updated data and refreshing the Tableau data source.
+
+The visualizations reflect the records collected for this project, not comprehensive global aviation statistics.
+
 ## Sample Execution Results
 
 In one successful sample run:
@@ -213,7 +271,8 @@ flight-data-platform/
 │   ├── 05_load_dwh.sql
 │   ├── 06_dwh_quality.sql
 │   ├── 07_add_date_fk.sql
-│   └── 08_analytics.sql
+│   ├── 08_analytics.sql
+|   └── 09_create_analytics_mart.sql
 │
 ├── tests/
 │   ├── test_extract_flights.py
